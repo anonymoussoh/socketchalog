@@ -1,4 +1,5 @@
 <?php
+//タイムゾーン設定
 date_default_timezone_set('Asia/Tokyo');
 
 class html{
@@ -10,7 +11,7 @@ class html{
  function __construct(){
  $this->get = $_GET;
  }
- 
+ //searchtypeのchecked属性検査
  function check_searchtype_name_ip(){
   if((isset($this->get['name']))||(isset($this->get['ip']))){
   return "checked";
@@ -18,7 +19,7 @@ class html{
   return "";
   }
  }
- 
+ //searchtypeのnameかipかのcheck属性検査
  function check_nameorip(){
   if(isset($this->get['ip'])){
   return array("","checked");
@@ -26,7 +27,7 @@ class html{
   return array("checked","");
   }
  }
- 
+ //name_ipに代入されるのはnameかipか
  function name_ip(){
   if(isset($this->get['name'])){
   return $this->get['name'];
@@ -36,7 +37,7 @@ class html{
   return "";
   }
  }
- 
+ //commentのchecked属性検査
  function check_comment(){
   if(isset($this->get['comment'])){
   return "checked";
@@ -44,7 +45,7 @@ class html{
   return "";
   }
  }
- 
+ //commentに代入される文字
  function comment(){
   if(isset($this->get['comment'])){
   return $this->get['comment'];
@@ -52,7 +53,7 @@ class html{
   return "";
   }
  }
- 
+ //valueの大きさ
  function value(){
   if(isset($this->get['value'])){
   return $this->get['value'];
@@ -60,7 +61,8 @@ class html{
   return "500";
   }
  }
- 
+ //getdateで連想配列として日時が出てくるのでそれをあらかじめ用意した配列に代入
+ //1000で割ってるのはミリ秒→秒
  function calc_date(){
   if(isset($this->get['starttime'])){
   $temp_starttime = getdate($this->get['starttime']/1000);
@@ -185,6 +187,7 @@ END;
 }
 
 function top(){
+//冒頭のfunctionで検査したものの返り値をここで代入したりとかですね
 $check_searchtype_name_ip =  $this->check_searchtype_name_ip();
 list($check_name,$check_ip) =  $this->check_nameorip();
 $name_ip = $this->name_ip();
@@ -305,17 +308,18 @@ echo "</p>";
  echo "<p style='text-align:center;'>";
  if(count($data['logs'])<$this->get['value']){
   if((int)$this->get['page']!==0){
-  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>■次へ";
+  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
   }else{
-  echo "前へ■次へ";
+  echo "前へ";
   }
+ echo "■次へ";
  }else{
   if((int)$this->get['page']!==0){
-  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>■";
+  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
   }else{
-  echo "前へ■";
+  echo "前へ";
   }
-  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
+ echo "■<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
  }
  echo "</p>";
  $i = 1;
@@ -332,12 +336,15 @@ echo "</p>";
   }else{
   $comment = $log['comment'];
   }
-  $fake_tag = array("[small]","[s]");
-  $real_tag = array("<small>","<s>");
+  //開きタグを本物に変換する作業
+  $fake_tag = array("[small]","[s]","[/s]");
+  $real_tag = array("<small>","<s>","</s>");
   $comment = str_replace($fake_tag,$real_tag,$comment);
+  //URLをリンクにする作業
   $comment = preg_replace("/(https?:\/\/[\w\.\/#!\?\-=%&:\+\~]*)/ui","<a href='$1'>$1</a>",$comment);
   $comment = preg_replace("/<a href='(http:\/\/myazo\.net\/\w+(.png)?)'>.+<\/a>/ui","<a href='$1'>[Myazo]</a>",$comment);
   $comment = preg_replace("/<a href='(http:\/\/gyazo\.com\/\w+(.png)?)'>.+<\/a>/ui","<a href='$1'>[Gyazo]</a>",$comment);
+  //閉じタグを開きタグの数に合わせて文末にセットする作業
   $small_tag_count = substr_count($comment,"<small>");
    while($small_tag_count){
     $comment .= "</small>";
