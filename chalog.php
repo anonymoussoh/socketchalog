@@ -195,7 +195,6 @@ $check_comment = $this->check_comment();
 $comment = $this->comment();
 $value = $this->value();
 $this->calc_date();
-//var_dump($this->startdate,$this->enddate);
  print <<<END
 <p>Javascriptが使用できることが必要動作条件です。</p>
 <form name='query' action='#' onsubmit="return send_query();">
@@ -234,7 +233,7 @@ END;
 }
 
 function logview(){
-//var_dump($this->get);
+//クエリ組立
 $query_url = "";
 $flag = 0;
  if(isset($this->get['starttime'])){
@@ -284,10 +283,9 @@ $flag = 0;
  $query_url .= "page=".$this->get['page'];
  $flag++;
  }
-// var_dump($query_url);
 $raw_data = file_get_contents("http://81.la:8001/chalog?".$query_url);
 $data = json_decode($raw_data,true);
-//var_dump($data);
+//表示部
 echo "<p>";
 if(isset($this->get['name'])){
 echo "名前：".$this->get['name'];
@@ -322,14 +320,12 @@ echo "</p>";
  echo "■<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
  }
  echo "</p>";
- $i = 1;
  foreach($data['logs'] as $log){
  $color = explode(".",$log['ip']);
  $r = intval($color[0]/1.33);
  $g = intval($color[1]/1.33);
  $b = intval($color[2]/1.33);
  $date = date("Y-m-d H:i:s",($log['time']/1000));
-// echo $i."｜";
  echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>";
   if(is_array($log['comment'])){
   $comment = $log['comment'][0];
@@ -357,7 +353,6 @@ echo "</p>";
    }
   echo $comment;
  echo "</span><span style='color:gray;font-size:small;'>(".$date.",".$log['ip'].")</span><br>\n";
- $i++;
  }
 }
 
