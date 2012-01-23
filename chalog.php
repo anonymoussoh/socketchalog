@@ -236,86 +236,78 @@ END;
 function logview(){
 //クエリ組立
 $query_url = "";
-$flag = 0;
- if(isset($this->get['starttime'])){
+$flag = false;
+ if((isset($this->get['starttime']))&&(is_numeric($this->get['starttime']))){
  $query_url .= "starttime=".$this->get['starttime'];
- $flag++;
+ $flag = true;
  }
- if(isset($this->get['endtime'])){
-  if($flag!==0){
+ if((isset($this->get['endtime']))&&(is_numeric($this->get['endtime']))){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "endtime=".$this->get['endtime'];
- $flag++;
+ $flag = true;
  }
  if(isset($this->get['name'])){
-  if($flag!==0){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "name=".rawurlencode($this->get['name']);
- $flag++;
+ $flag = true;
  }
  if(isset($this->get['ip'])){
-  if($flag!==0){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "ip=".$this->get['ip'];
- $flag++;
+ $flag = true;
  }
  if(isset($this->get['comment'])){
-  if($flag!==0){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "comment=".rawurlencode($this->get['comment']);
- $flag++;
+ $flag = true;
  }
  if(isset($this->get['value'])){
-  if($flag!==0){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "value=".$this->get['value'];
- $flag++;
  }
  $query_url_without_page = $query_url;
  if(isset($this->get['page'])){
-  if($flag!==0){
+  if($flag){
   $query_url .= "&";
   }
  $query_url .= "page=".$this->get['page'];
- $flag++;
  }
 $raw_data = file_get_contents("http://81.la:8001/chalog?".$query_url);
 $data = json_decode($raw_data,true);
 //表示部
 echo "<table>";
 echo "<caption>検索条件</caption>";
-$flag = true;
 if(isset($this->get['name'])){
-echo "<tr><th>名前</th><td>".$this->get['name']."</td></tr>";
-$flag = false;
+echo "<tr><th>名前</th><td>".htmlspecialchars($this->get['name'],ENT_QUOTES,"UTF-8")."</td></tr>";
 }
 if(isset($this->get['ip'])){
-echo "<tr><th>IPアドレス</th><td>".$this->get['ip']."</td></tr>";
-$flag = false;
+echo "<tr><th>IPアドレス</th><td>".htmlspecialchars($this->get['ip'],ENT_QUOTES,"UTF-8")."</td></tr>";
 }
 if(isset($this->get['comment'])){
-echo "<tr><th>コメント</th><td>".$this->get['comment']."</td></tr>";
-$flag = false;
+echo "<tr><th>コメント</th><td>".htmlspecialchars($this->get['comment'],ENT_QUOTES,"UTF-8")."</td></tr>";
 }
 if(isset($this->get['starttime'])){
 echo "<tr><th>始点時刻</th><td>".date("Y-m-d H:i:s",($this->get['starttime']/1000))."</td></tr>";
-$flag = false;
 }
 if(isset($this->get['endtime'])){
 echo "<tr><th>終点時刻</th><td>".date("Y-m-d H:i:s",($this->get['endtime']/1000))."</td></tr>";
-$flag = false;
 }
- if($flag){
+ if(!$flag){
  echo "<tr><td style='text-align:center;'>条件なし</td></tr>";
  }
 echo "</table>";
  echo "<p style='text-align:center;'>";
- if((int)$this->get['page']!==0){
+ if((isset($this->get['page']))&&((int)$this->get['page']!==0)){
  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
  }else{
  echo "前へ";
@@ -324,6 +316,9 @@ echo "</table>";
  if(count($data['logs'])<$this->get['value']){
  echo "次へ";
  }else{
+  if(!isset($this->get['page'])){
+  $this->get['page'] = 0;
+  }
  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
  }
  echo "</p>";
