@@ -101,13 +101,24 @@ year = today.getFullYear();
 month = today.getMonth();
 month++;
 day = today.getDate();
+if(document.query.maxyear.value==""){
 document.query.maxyear.value = year;
+}
+if(document.query.maxmonth.value==""){
 document.query.maxmonth.value = month;
+}
+if(document.query.maxday.value==""){
 document.query.maxday.value = day;
+}
+if(document.query.minyear.value==""){
 document.query.minyear.value = year;
+}
+if(document.query.minmonth.value==""){
 document.query.minmonth.value = month;
+}
+if(document.query.minday.value==""){
 document.query.minday.value = day;
-
+}
 }
 
 function send_query(){
@@ -236,51 +247,36 @@ END;
 function logview(){
 //クエリ組立
 $query_url = "";
+$query_url_array = array();
 $flag = false;
  if((isset($this->get['starttime']))&&(is_numeric($this->get['starttime']))){
- $query_url .= "starttime=".$this->get['starttime'];
+ $query_url_array[] = "starttime=".$this->get['starttime'];
  $flag = true;
  }
  if((isset($this->get['endtime']))&&(is_numeric($this->get['endtime']))){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "endtime=".$this->get['endtime'];
+ $query_url_array[] = "endtime=".$this->get['endtime'];
  $flag = true;
  }
  if(isset($this->get['name'])){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "name=".rawurlencode($this->get['name']);
+ $query_url_array[] = "name=".rawurlencode($this->get['name']);
  $flag = true;
  }
  if(isset($this->get['ip'])){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "ip=".$this->get['ip'];
+ $query_url_array[] = "ip=".$this->get['ip'];
  $flag = true;
  }
  if(isset($this->get['comment'])){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "comment=".rawurlencode($this->get['comment']);
+ $query_url_array[] = "comment=".rawurlencode($this->get['comment']);
  $flag = true;
  }
  if(isset($this->get['value'])){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "value=".$this->get['value'];
+ $query_url_array[] = "value=".$this->get['value'];
  }
- $query_url_without_page = $query_url;
+ $query_url_without_page = implode("&",$query_url_array);
  if(isset($this->get['page'])){
-  if($flag){
-  $query_url .= "&";
-  }
- $query_url .= "page=".$this->get['page'];
+ $query_url = $query_url_without_page."&page=".$this->get['page'];
+ }else{
+ $query_url = $query_url_without_page;
  }
 $raw_data = file_get_contents("http://81.la:8001/chalog?".$query_url);
 $data = json_decode($raw_data,true);
