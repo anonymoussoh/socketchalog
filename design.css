@@ -1,0 +1,13 @@
+table{
+margin:auto;
+border-width:1px;
+border-style:solid;
+border-color:gray;
+width:30%;
+}
+th{
+width:50%;
+}
+td{
+width:50%;
+}

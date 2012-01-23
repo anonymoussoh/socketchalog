@@ -3,10 +3,10 @@
 date_default_timezone_set('Asia/Tokyo');
 
 class html{
- public $get = array();
- public $startdate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
- public $enddate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
- public $check_searcharea = "";
+ private $get = array();
+ private $startdate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
+ private $enddate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
+ private $check_searcharea = "";
  
  function __construct(){
  $this->get = $_GET;
@@ -92,6 +92,7 @@ function header(){
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta http-equiv="Content-Script-Type" content="text/javascript">
+ <link rel="STYLESHEET" href="design.css" type="text/css">
 <title>Lograhack NEO(Beta) LHN-1</title>
 <script type='text/javascript'>
 function preload(){
@@ -286,38 +287,44 @@ $flag = 0;
 $raw_data = file_get_contents("http://81.la:8001/chalog?".$query_url);
 $data = json_decode($raw_data,true);
 //表示部
-echo "<p>";
+echo "<table>";
+echo "<caption>検索条件</caption>";
+$flag = true;
 if(isset($this->get['name'])){
-echo "名前：".$this->get['name'];
+echo "<tr><th>名前</th><td>".$this->get['name']."</td></tr>";
+$flag = false;
 }
 if(isset($this->get['ip'])){
-echo "IPアドレス：".$this->get['ip'];
+echo "<tr><th>IPアドレス</th><td>".$this->get['ip']."</td></tr>";
+$flag = false;
 }
 if(isset($this->get['comment'])){
-echo "コメント：".$this->get['comment'];
+echo "<tr><th>コメント</th><td>".$this->get['comment']."</td></tr>";
+$flag = false;
 }
 if(isset($this->get['starttime'])){
-echo "始点時刻".date("Y-m-d H:i:s",($this->get['starttime']/1000));
+echo "<tr><th>始点時刻</th><td>".date("Y-m-d H:i:s",($this->get['starttime']/1000))."</td></tr>";
+$flag = false;
 }
 if(isset($this->get['endtime'])){
-echo "終点時刻".date("Y-m-d H:i:s",($this->get['endtime']/1000));
+echo "<tr><th>終点時刻</th><td>".date("Y-m-d H:i:s",($this->get['endtime']/1000))."</td></tr>";
+$flag = false;
 }
-echo "</p>";
+ if($flag){
+ echo "<tr><td style='text-align:center;'>条件なし</td></tr>";
+ }
+echo "</table>";
  echo "<p style='text-align:center;'>";
- if(count($data['logs'])<$this->get['value']){
-  if((int)$this->get['page']!==0){
-  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
-  }else{
-  echo "前へ";
-  }
- echo "■次へ";
+ if((int)$this->get['page']!==0){
+ echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
  }else{
-  if((int)$this->get['page']!==0){
-  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
-  }else{
-  echo "前へ";
-  }
- echo "■<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
+ echo "前へ";
+ }
+ echo "■";
+ if(count($data['logs'])<$this->get['value']){
+ echo "次へ";
+ }else{
+ echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
  }
  echo "</p>";
  foreach($data['logs'] as $log){
