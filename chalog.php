@@ -326,9 +326,9 @@ echo "</table>";
  $date = date("Y-m-d H:i:s",($log['time']/1000));
  echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>";
   if(is_array($log['comment'])){
-  $comment = $log['comment'][0];
+  $comment = htmlspecialchars($log['comment'][0],ENT_QUOTES,"UTF-8");
   }else{
-  $comment = $log['comment'];
+  $comment = htmlspecialchars($log['comment'],ENT_QUOTES,"UTF-8");
   }
   //開きタグを本物に変換する作業
   $fake_tag = array("[small]","[s]","[/s]");
