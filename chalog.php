@@ -318,13 +318,15 @@ echo "</table>";
  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
  }
  echo "</p>";
+ echo "<p style='line-height:1.2;letter-spacing:0.5px;'>";
+ $n = 1;
  foreach($data['logs'] as $log){
+ $line_number = sprintf("%04d",$n);
  $color = explode(".",$log['ip']);
  $r = intval($color[0]/1.33);
  $g = intval($color[1]/1.33);
  $b = intval($color[2]/1.33);
  $date = date("Y-m-d H:i:s",($log['time']/1000));
- echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>";
   if(is_array($log['comment'])){
   $comment = htmlspecialchars($log['comment'][0],ENT_QUOTES,"UTF-8");
   }else{
@@ -350,9 +352,16 @@ echo "</table>";
     $comment .= "</s>";
    $strike_tag_count--;
    }
-  echo $comment;
- echo "</span><span style='color:gray;font-size:small;'>(".$date.",".$log['ip'].")</span><br>\n";
+ $before_term = $log['time'] - 30*60*1000;
+ $after_term = $log['time'] + 30*60*1000;
+ $detail_query = "chalog.php?starttime=".$before_term."&endtime=".$after_term."&value=500";
+ echo "<a href='".$detail_query."' target='_blank'>".$line_number."</a>：";
+ echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>&nbsp;";
+ echo $comment;
+ echo "</span>&nbsp;<span style='color:silver;font-size:small;'>(".$date.",".$log['ip'].")</span><br>\n";
+ $n++;
  }
+ echo "</p>";
 }
 
 }
