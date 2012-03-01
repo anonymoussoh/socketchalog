@@ -352,6 +352,11 @@ echo "</table>";
     $comment .= "</s>";
    $strike_tag_count--;
    }
+  $code_tag_count = substr_count($comment,"<code>");
+   while($code_tag_count){
+    $comment .= "</code>";
+   $code_tag_count--;
+   }
  $before_term = $log['time'] - 30*60*1000;
  $after_term = $log['time'] + 30*60*1000;
  $detail_query = "chalog.php?starttime=".$before_term."&endtime=".$after_term."&value=500";
