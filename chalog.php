@@ -212,16 +212,16 @@ $this->calc_date();
 <form name='query' action='#' onsubmit="return send_query();">
 <fieldset><legend>取得範囲</legend>
 <p><label><input type="checkbox" name="searcharea" value="time"  {$this->check_searcharea}>発言時間で検索</label>：
-始点時間<input type="text" name="minyear" value="{$this->startdate['year']}" size="4">年
-<input type="text" name="minmonth" value="{$this->startdate['month']}" size="2">月
-<input type="text" name="minday" value="{$this->startdate['day']}" size="2">日
-<input type="text" name="minhour" value="{$this->startdate['hour']}" size="2">時
-<input type="text" name="minminute" value="{$this->startdate['minute']}" size="2">分
-終点時間<input type="text" name="maxyear" value="{$this->enddate['year']}" size="4">年
-<input type="text" name="maxmonth" value="{$this->enddate['month']}" size="2">月
-<input type="text" name="maxday" value="{$this->enddate['day']}" size="2">日
-<input type="text" name="maxhour" value="{$this->enddate['hour']}" size="2">時
-<input type="text" name="maxminute" value="{$this->enddate['minute']}" size="2">分<br>
+始点時間<input type="text" name="minyear" value="{$this->startdate['year']}" size="6">年
+<input type="text" name="minmonth" value="{$this->startdate['month']}" size="4">月
+<input type="text" name="minday" value="{$this->startdate['day']}" size="4">日
+<input type="text" name="minhour" value="{$this->startdate['hour']}" size="4">時
+<input type="text" name="minminute" value="{$this->startdate['minute']}" size="4">分
+終点時間<input type="text" name="maxyear" value="{$this->enddate['year']}" size="6">年
+<input type="text" name="maxmonth" value="{$this->enddate['month']}" size="4">月
+<input type="text" name="maxday" value="{$this->enddate['day']}" size="4">日
+<input type="text" name="maxhour" value="{$this->enddate['hour']}" size="4">時
+<input type="text" name="maxminute" value="{$this->enddate['minute']}" size="4">分<br>
 <ul>
 <li>am/pmの12時間制ではなく24時間制で入力をお願いします。</li>
 <li>最小に空白の欄があると最大までの24時間分を取得します</li>
@@ -331,11 +331,12 @@ echo "</table>";
   $comment = htmlspecialchars($log['comment'],ENT_QUOTES,"UTF-8");
   }
   //開きタグを本物に変換する作業
-  $fake_tag = array("[small]","[s]","[/s]");
-  $real_tag = array("<small>","<s>","</s>");
+  $fake_tag = array("[small]","[s]","[/s]","[code]","[/code]");
+  $real_tag = array("<small>","<s>","</s>","<code>","</code>");
   $comment = str_replace($fake_tag,$real_tag,$comment);
   //URLをリンクにする作業
-  $comment = preg_replace("/(https?:\/\/[\w\.\/#!\?\-=%&:\+\~]*)/ui","<a href='$1'>$1</a>",$comment);
+//  $comment = preg_replace("/(https?:\/\/[\w\.\/#!\?\-=%&:\+\~]*)/ui","<a href='$1'>$1</a>",$comment);
+  $comment = preg_replace("/^https?:\/\/\S+/u","<a href='$1'>$1</a>",$comment);
   $comment = preg_replace("/<a href='(http:\/\/myazo\.net\/\w+(.png)?)'>.+<\/a>/ui","<a href='$1'>[Myazo]</a>",$comment);
   $comment = preg_replace("/<a href='(http:\/\/gyazo\.com\/\w+(.png)?)'>.+<\/a>/ui","<a href='$1'>[Gyazo]</a>",$comment);
   //閉じタグを開きタグの数に合わせて文末にセットする作業
