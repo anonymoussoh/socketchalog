@@ -250,11 +250,11 @@ $query_url = "";
 $query_url_array = array();
 $flag = false;
  if((isset($this->get['starttime']))&&(is_numeric($this->get['starttime']))){
- $query_url_array[] = "starttime=".$this->get['starttime'];
+ $query_url_array[] = "starttime=".$this->get['starttime']*1000;
  $flag = true;
  }
  if((isset($this->get['endtime']))&&(is_numeric($this->get['endtime']))){
- $query_url_array[] = "endtime=".$this->get['endtime'];
+ $query_url_array[] = "endtime=".$this->get['endtime']*1000;
  $flag = true;
  }
  if(isset($this->get['name'])){
@@ -293,10 +293,10 @@ if(isset($this->get['comment'])){
 echo "<tr><th>コメント</th><td>".htmlspecialchars($this->get['comment'],ENT_QUOTES,"UTF-8")."</td></tr>";
 }
 if(isset($this->get['starttime'])){
-echo "<tr><th>始点時刻</th><td>".date("Y-m-d H:i:s",($this->get['starttime']/1000))."</td></tr>";
+echo "<tr><th>始点時刻</th><td>".date("Y-m-d H:i:s",$this->get['starttime'])."</td></tr>";
 }
 if(isset($this->get['endtime'])){
-echo "<tr><th>終点時刻</th><td>".date("Y-m-d H:i:s",($this->get['endtime']/1000))."</td></tr>";
+echo "<tr><th>終点時刻</th><td>".date("Y-m-d H:i:s",$this->get['endtime'])."</td></tr>";
 }
  if(!$flag){
  echo "<tr><td style='text-align:center;'>条件なし</td></tr>";
@@ -321,12 +321,19 @@ echo "</table>";
  echo "<p style='line-height:1.2;letter-spacing:0.5px;'>";
  $n = 1;
  foreach($data['logs'] as $log){
+  try{
+  $date = new DateTime($log['time']);
+  }catch (Exception $e){
+  echo $e->getMessage();
+  die(1);
+  }
+ $unixtime = $date->getTimestamp();
  $line_number = sprintf("%04d",$n);
  $color = explode(".",$log['ip']);
  $r = intval($color[0]/1.33);
  $g = intval($color[1]/1.33);
  $b = intval($color[2]/1.33);
- $date = date("Y-m-d H:i:s",($log['time']/1000));
+ $date = date("Y-m-d H:i:s",$unixtime);
   if(is_array($log['comment'])){
   $comment = htmlspecialchars($log['comment'][0],ENT_QUOTES,"UTF-8");
   }else{
@@ -357,8 +364,8 @@ echo "</table>";
     $comment .= "</code>";
    $code_tag_count--;
    }
- $before_term = $log['time'] - 30*60*1000;
- $after_term = $log['time'] + 30*60*1000;
+ $before_term = $unixtime - 30*60;
+ $after_term = $unixtime + 30*60;
  $detail_query = "chalog.php?starttime=".$before_term."&endtime=".$after_term."&value=500";
  echo "<a href='".$detail_query."' target='_blank'>".$line_number."</a>：";
  echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>&nbsp;";
