@@ -65,7 +65,7 @@ class html{
  //1000で割ってるのはミリ秒→秒
  function calc_date(){
   if(isset($this->get['starttime'])){
-  $temp_starttime = getdate($this->get['starttime']/1000);
+  $temp_starttime = getdate($this->get['starttime']);
   $this->startdate['minute'] = $temp_starttime['minutes'];
   $this->startdate['hour'] = $temp_starttime['hours'];
   $this->startdate['day'] = $temp_starttime['mday'];
@@ -74,7 +74,7 @@ class html{
   $this->check_searcharea = "checked";
   }
   if(isset($this->get['endtime'])){
-  $temp_endtime = getdate($this->get['endtime']/1000);
+  $temp_endtime = getdate($this->get['endtime']);
   $this->enddate['minute'] = $temp_endtime['minutes'];
   $this->enddate['hour'] = $temp_endtime['hours'];
   $this->enddate['day'] = $temp_endtime['mday'];
