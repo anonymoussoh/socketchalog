@@ -181,7 +181,6 @@ mintime = minDate.getTime();
  return false;
 }
 </script>
-<!--(form要素).addEventListener("submit", function(e){処理; e.preventDefault();})-->
 </head>
 <body onload="preload();">
 <h1>Lograhack NEO(Beta) LHN-1</h1>
@@ -209,6 +208,7 @@ $value = $this->value();
 $this->calc_date();
  print <<<END
 <p>Javascriptが使用できることが必要動作条件です。</p>
+<p><a href='chalog.php'>chalog.php</a></p>
 <form name='query' action='#' onsubmit="return send_query();">
 <fieldset><legend>取得範囲</legend>
 <p><label><input type="checkbox" name="searcharea" value="time"  {$this->check_searcharea}>発言時間で検索</label>：
