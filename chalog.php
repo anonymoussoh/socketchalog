@@ -250,11 +250,11 @@ $query_url = "";
 $query_url_array = array();
 $flag = false;
  if((isset($this->get['starttime']))&&(is_numeric($this->get['starttime']))){
- $query_url_array[] = "starttime=".$this->get['starttime']*1000;
+ $query_url_array[] = "starttime=".$this->get['starttime'];
  $flag = true;
  }
  if((isset($this->get['endtime']))&&(is_numeric($this->get['endtime']))){
- $query_url_array[] = "endtime=".$this->get['endtime']*1000;
+ $query_url_array[] = "endtime=".$this->get['endtime'];
  $flag = true;
  }
  if(isset($this->get['name'])){
@@ -278,7 +278,7 @@ $flag = false;
  }else{
  $query_url = $query_url_without_page;
  }
-$raw_data = file_get_contents("http://81.la:8001/chalog?".$query_url);
+$raw_data = file_get_contents("http://chat.81.la/chalog?".$query_url);
 $data = json_decode($raw_data,true);
 //表示部
 echo "<table>";
