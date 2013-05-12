@@ -15,9 +15,8 @@ class html{
  function check_searchtype_name_ip(){
   if((isset($this->get['name']))||(isset($this->get['ip']))){
   return "checked";
-  }else{
-  return "";
   }
+ return "";
  }
  //searchtypeのnameかipかのcheck属性検査
  function check_nameorip(){
@@ -41,25 +40,22 @@ class html{
  function check_comment(){
   if(isset($this->get['comment'])){
   return "checked";
-  }else{
-  return "";
   }
+ return "";
  }
  //commentに代入される文字
  function comment(){
   if(isset($this->get['comment'])){
   return $this->get['comment'];
-  }else{
-  return "";
   }
+ return "";
  }
  //valueの大きさ
  function value(){
   if(isset($this->get['value'])){
   return $this->get['value'];
-  }else{
-  return "500";
   }
+ return "500";
  }
  //getdateで連想配列として日時が出てくるのでそれをあらかじめ用意した配列に代入
  //1000で割ってるのはミリ秒→秒
@@ -94,93 +90,7 @@ function header(){
 <meta http-equiv="Content-Script-Type" content="text/javascript">
  <link rel="STYLESHEET" href="design.css" type="text/css">
 <title>Lograhack NEO(Beta) LHN-1</title>
-<script type='text/javascript'>
-function preload(){
-today = new Date();
-year = today.getFullYear();
-month = today.getMonth();
-month++;
-day = today.getDate();
-if(document.query.maxyear.value==""){
-document.query.maxyear.value = year;
-}
-if(document.query.maxmonth.value==""){
-document.query.maxmonth.value = month;
-}
-if(document.query.maxday.value==""){
-document.query.maxday.value = day;
-}
-if(document.query.minyear.value==""){
-document.query.minyear.value = year;
-}
-if(document.query.minmonth.value==""){
-document.query.minmonth.value = month;
-}
-if(document.query.minday.value==""){
-document.query.minday.value = day;
-}
-}
-
-function send_query(){
-maxyear = document.query.maxyear.value;
-maxmonth = document.query.maxmonth.value;
-maxmonth--;
-maxday = document.query.maxday.value;
-maxhour = document.query.maxhour.value;
-maxminute = document.query.maxminute.value;
-maxDate = new Date(parseInt(maxyear),parseInt(maxmonth),parseInt(maxday),parseInt(maxhour),parseInt(maxminute));
-maxtime = maxDate.getTime();
-
-minyear = document.query.minyear.value;
-minmonth = document.query.minmonth.value;
-minmonth--;
-minday = document.query.minday.value;
-minhour = document.query.minhour.value;
-minminute = document.query.minminute.value;
-minDate = new Date(parseInt(minyear),parseInt(minmonth),parseInt(minday),parseInt(minhour),parseInt(minminute));
-mintime = minDate.getTime();
-
- var url = "chalog.php?"
- if(document.query.searcharea.checked){
-  if(mintime){
-  url += "starttime=" + mintime;
-  }
-  if((mintime)&&(maxtime)){
-  url += "&";
-  }
-  if(maxtime){
-  url += "endtime=" + maxtime;
-  }
- url += "&";
- }
- if(document.query.searchtype[0].checked){
-  if(document.query.nameorip[0].checked){
-  url += "name="+encodeURIComponent(document.query.name_ip.value);
-  }
-  if((document.query.nameorip[0].checked==true)&&(document.query.nameorip[1].checked==true)){
-  url += "&";
-  }
-  if(document.query.nameorip[1].checked){
-  url += "ip="+escape(document.query.name_ip.value);
-  }
- url += "&";
- }
- if((document.query.searchtype[1].checked==true)&&(document.query.comment.value)){
- url += "comment="+encodeURIComponent(document.query.comment.value)+"&";
- }
- if(document.query.latest.value){
-  if(parseInt(document.query.latest.value)>5000){
-  url += "value=5000&page=0";
-  }else{
-  url += "value="+document.query.latest.value+"&page=0";
-  }
- }else{
- url += "value=500&page=0";
- }
- location.href = url;
- return false;
-}
-</script>
+<script type='text/javascript' src='parameter.js'></script>
 </head>
 <body onload="preload();">
 <h1>Lograhack NEO(Beta) LHN-1</h1>
@@ -232,6 +142,7 @@ $this->calc_date();
 <fieldset><legend>検索条件</legend>
 <p><input type="checkbox" name="searchtype" {$check_searchtype_name_ip}><label><input type="radio" name="nameorip" value="name" {$check_name}>名前</label>or<label><input type="radio" name="nameorip" value="ip" {$check_ip}>IPアドレス</label>で検索：<input type="text" name="name_ip" value="{$name_ip}" size="15"></p>
 <p><label><input type="checkbox" name="searchtype" {$check_comment}>コメントで検索</label>：<input type="text" name="comment" value="{$comment}" size="30"></p>
+<p><label><input type="checkbox" name="searchtype">タグで検索</label>：<input type="text" name="channel" value="" size="30"></p>
 <p>上の「名前で検索」と併用すると「特定人物の特定内容の発言」が抜き出されます。</p>
 <p>ここでいずれも指定しない場合、上記範囲の全文が表示されます。</p>
 </fieldset>
