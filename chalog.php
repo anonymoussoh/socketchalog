@@ -3,24 +3,23 @@
 date_default_timezone_set('Asia/Tokyo');
 
 class html{
- private $get = array();
- private $startdate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
- private $enddate = array("year"=>"","month"=>"","day"=>"","hour"=>"","minute"=>"");
+ private $parameter = array();
  private $check_searcharea = "";
+ private $date = array("start"=>array(),"end"=>array());
  
  function __construct(){
- $this->get = $_GET;
+ $this->parameter = $_GET;
  }
  //searchtypeのchecked属性検査
  function check_searchtype_name_ip(){
-  if((isset($this->get['name']))||(isset($this->get['ip']))){
+  if((isset($this->parameter['name']))||(isset($this->parameter['ip']))){
   return "checked";
   }
  return "";
  }
  //searchtypeのnameかipかのcheck属性検査
  function check_nameorip(){
-  if(isset($this->get['ip'])){
+  if(isset($this->parameter['ip'])){
   return array("","checked");
   }else{
   return array("checked","");
@@ -28,60 +27,54 @@ class html{
  }
  //name_ipに代入されるのはnameかipか
  function name_ip(){
-  if(isset($this->get['name'])){
-  return $this->get['name'];
-  }else if(isset($this->get['ip'])){
-  return $this->get['ip'];
+  if(isset($this->parameter['name'])){
+  return $this->parameter['name'];
+  }else if(isset($this->parameter['ip'])){
+  return $this->parameter['ip'];
   }else{
   return "";
   }
  }
  //commentのchecked属性検査
  function check_comment(){
-  if(isset($this->get['comment'])){
+  if(isset($this->parameter['comment'])){
   return "checked";
   }
  return "";
  }
  //commentに代入される文字
  function comment(){
-  if(isset($this->get['comment'])){
-  return $this->get['comment'];
+  if(isset($this->parameter['comment'])){
+  return $this->parameter['comment'];
   }
  return "";
  }
  //valueの大きさ
  function value(){
-  if(isset($this->get['value'])){
-  return $this->get['value'];
+  if(isset($this->parameter['value'])){
+  return $this->parameter['value'];
   }
  return "500";
  }
  //getdateで連想配列として日時が出てくるのでそれをあらかじめ用意した配列に代入
  //1000で割ってるのはミリ秒→秒
  function calc_date(){
-  if(isset($this->get['starttime'])){
-  $temp_starttime = getdate($this->get['starttime']);
-  $this->startdate['minute'] = $temp_starttime['minutes'];
-  $this->startdate['hour'] = $temp_starttime['hours'];
-  $this->startdate['day'] = $temp_starttime['mday'];
-  $this->startdate['month'] = $temp_starttime['mon'];
-  $this->startdate['year'] = $temp_starttime['year'];
+  if(isset($this->parameter['starttime'])){
+  $start_date = new DateTime($this->parameter['starttime']);
+  $start_timestamp = $start_date->getTimestamp();
+  $this->date['start'] = getdate($start_timestamp);
   $this->check_searcharea = "checked";
   }
-  if(isset($this->get['endtime'])){
-  $temp_endtime = getdate($this->get['endtime']);
-  $this->enddate['minute'] = $temp_endtime['minutes'];
-  $this->enddate['hour'] = $temp_endtime['hours'];
-  $this->enddate['day'] = $temp_endtime['mday'];
-  $this->enddate['month'] = $temp_endtime['mon'];
-  $this->enddate['year'] = $temp_endtime['year'];
+  if(isset($this->parameter['endtime'])){
+  $end_date = new DateTime($this->parameter['endtime']);
+  $end_timestamp = $end_date->getTimestamp();
+  $this->date['end'] = getdate($end_timestamp);
   $this->check_searcharea = "checked";
   }
  }
 
 
-function header(){
+ function header(){
  print <<<END
 <html>
 <head>
@@ -95,9 +88,9 @@ function header(){
 <body onload="preload();">
 <h1>Lograhack NEO(Beta) LHN-1</h1>
 END;
-}
+ }
 
-function footer(){
+ function footer(){
  print <<<END
 
 </body>
@@ -105,33 +98,34 @@ function footer(){
 
 END;
 
-}
+ }
 
-function top(){
-//冒頭のfunctionで検査したものの返り値をここで代入したりとかですね
-$check_searchtype_name_ip =  $this->check_searchtype_name_ip();
-list($check_name,$check_ip) =  $this->check_nameorip();
-$name_ip = $this->name_ip();
-$check_comment = $this->check_comment();
-$comment = $this->comment();
-$value = $this->value();
-$this->calc_date();
+ function top(){
+ //冒頭のfunctionで検査したものの返り値をここで代入したりとかですね
+ $check_searchtype_name_ip =  $this->check_searchtype_name_ip();
+ list($check_name,$check_ip) =  $this->check_nameorip();
+ $name_ip = $this->name_ip();
+ $check_comment = $this->check_comment();
+ $comment = $this->comment();
+ $value = $this->value();
+ $this->calc_date();
  print <<<END
 <p>Javascriptが使用できることが必要動作条件です。</p>
 <p><a href='chalog.php'>chalog.php</a></p>
 <form name='query' action='#' onsubmit="return send_query();">
 <fieldset><legend>取得範囲</legend>
 <p><label><input type="checkbox" name="searcharea" value="time"  {$this->check_searcharea}>発言時間で検索</label>：
-始点時間<input type="text" name="minyear" value="{$this->startdate['year']}" size="6">年
-<input type="text" name="minmonth" value="{$this->startdate['month']}" size="4">月
-<input type="text" name="minday" value="{$this->startdate['day']}" size="4">日
-<input type="text" name="minhour" value="{$this->startdate['hour']}" size="4">時
-<input type="text" name="minminute" value="{$this->startdate['minute']}" size="4">分
-終点時間<input type="text" name="maxyear" value="{$this->enddate['year']}" size="6">年
-<input type="text" name="maxmonth" value="{$this->enddate['month']}" size="4">月
-<input type="text" name="maxday" value="{$this->enddate['day']}" size="4">日
-<input type="text" name="maxhour" value="{$this->enddate['hour']}" size="4">時
-<input type="text" name="maxminute" value="{$this->enddate['minute']}" size="4">分<br>
+始点時間<input type="text" name="minyear" value="{$this->date['start']['year']}" size="6">年
+<input type="text" name="minmonth" value="{$this->date['start']['mon']}" size="4">月
+<input type="text" name="minday" value="{$this->date['start']['mday']}" size="4">日
+<input type="text" name="minhour" value="{$this->date['start']['hours']}" size="4">時
+<input type="text" name="minminute" value="{$this->date['start']['minutes']}" size="4">分
+
+終点時間<input type="text" name="maxyear" value="{$this->date['end']['year']}" size="6">年
+<input type="text" name="maxmonth" value="{$this->date['end']['mon']}" size="4">月
+<input type="text" name="maxday" value="{$this->date['end']['mday']}" size="4">日
+<input type="text" name="maxhour" value="{$this->date['end']['hours']}" size="4">時
+<input type="text" name="maxminute" value="{$this->date['end']['minutes']}" size="4">分<br>
 <ul>
 <li>am/pmの12時間制ではなく24時間制で入力をお願いします。</li>
 <li>最小に空白の欄があると最大までの24時間分を取得します</li>
@@ -150,101 +144,76 @@ $this->calc_date();
 <p><input type="text" name="latest" value="{$value}" size="8">件<br>
 空欄だと500件を表示します。最大で5000行までです。</p>
 </fieldset>
-<input type="submit" value="送信">
+<input type="submit" value="検索">
 </form>
 END;
 }
 
-function logview(){
-//クエリ組立
-$query_url = "";
-$query_url_array = array();
-$flag = false;
- if((isset($this->get['starttime']))&&(is_numeric($this->get['starttime']))){
- $query_url_array[] = "starttime=".$this->get['starttime'];
- $flag = true;
+ function logview(){
+ //表示部
+ echo "<table>";
+ echo "<caption>検索条件</caption>";
+ if(isset($this->parameter['name'])){
+ echo "<tr><th>名前</th><td>".htmlspecialchars($this->parameter['name'],ENT_QUOTES,"UTF-8")."</td></tr>";
  }
- if((isset($this->get['endtime']))&&(is_numeric($this->get['endtime']))){
- $query_url_array[] = "endtime=".$this->get['endtime'];
- $flag = true;
+ if(isset($this->parameter['ip'])){
+ echo "<tr><th>IPアドレス</th><td>".htmlspecialchars($this->parameter['ip'],ENT_QUOTES,"UTF-8")."</td></tr>";
  }
- if(isset($this->get['name'])){
- $query_url_array[] = "name=".rawurlencode($this->get['name']);
- $flag = true;
+ if(isset($this->parameter['comment'])){
+ echo "<tr><th>コメント</th><td>".htmlspecialchars($this->parameter['comment'],ENT_QUOTES,"UTF-8")."</td></tr>";
  }
- if(isset($this->get['ip'])){
- $query_url_array[] = "ip=".$this->get['ip'];
- $flag = true;
+ if(isset($this->parameter['starttime'])){
+  $start_date = new DateTime($this->parameter['starttime']);
+  $start_timestamp = $start_date->getTimestamp();
+ echo "<tr><th>始点時刻</th><td>".date('Y-m-d H:i:s',$start_timestamp)."</td></tr>";
  }
- if(isset($this->get['comment'])){
- $query_url_array[] = "comment=".rawurlencode($this->get['comment']);
- $flag = true;
+ if(isset($this->parameter['endtime'])){
+  $end_date = new DateTime($this->parameter['endtime']);
+  $end_timestamp = $end_date->getTimestamp();
+ echo "<tr><th>終点時刻</th><td>".date('Y-m-d H:i:s',$end_timestamp)."</td></tr>";
  }
- if(isset($this->get['value'])){
- $query_url_array[] = "value=".$this->get['value'];
- }
- $query_url_without_page = implode("&",$query_url_array);
- if(isset($this->get['page'])){
- $query_url = $query_url_without_page."&page=".$this->get['page'];
- }else{
- $query_url = $query_url_without_page;
- }
-$raw_data = file_get_contents("http://chat.81.la/chalog?".$query_url);
-$data = json_decode($raw_data,true);
-//表示部
-echo "<table>";
-echo "<caption>検索条件</caption>";
-if(isset($this->get['name'])){
-echo "<tr><th>名前</th><td>".htmlspecialchars($this->get['name'],ENT_QUOTES,"UTF-8")."</td></tr>";
-}
-if(isset($this->get['ip'])){
-echo "<tr><th>IPアドレス</th><td>".htmlspecialchars($this->get['ip'],ENT_QUOTES,"UTF-8")."</td></tr>";
-}
-if(isset($this->get['comment'])){
-echo "<tr><th>コメント</th><td>".htmlspecialchars($this->get['comment'],ENT_QUOTES,"UTF-8")."</td></tr>";
-}
-if(isset($this->get['starttime'])){
-echo "<tr><th>始点時刻</th><td>".date("Y-m-d H:i:s",$this->get['starttime'])."</td></tr>";
-}
-if(isset($this->get['endtime'])){
-echo "<tr><th>終点時刻</th><td>".date("Y-m-d H:i:s",$this->get['endtime'])."</td></tr>";
-}
- if(!$flag){
- echo "<tr><td style='text-align:center;'>条件なし</td></tr>";
- }
-echo "</table>";
- echo "<p style='text-align:center;'>";
- if((isset($this->get['page']))&&((int)$this->get['page']!==0)){
- echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']-1)."'>前へ</a>";
- }else{
- echo "前へ";
- }
- echo "■";
- if(count($data['logs'])<$this->get['value']){
- echo "次へ";
- }else{
-  if(!isset($this->get['page'])){
-  $this->get['page'] = 0;
+
+  if(count($this->parameter)===2 && array_keys($this->parameter) === array('value','page')){
+  echo "<tr><td style='text-align:center;'>条件なし</td></tr>";
   }
- echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->get['page']+1)."'>次へ</a>";
- }
+ 
+ echo "</table>";
+ 
+ //クエリ組み立てインスタンス
+ $query = new query($this->parameter);
+ $data = $query->fetch_data();
+ $query_url_without_page = $query->get_query();
+// var_dump($query_url_without_page);
+
+ echo "<p style='text-align:center;'>";
+  if((isset($this->parameter['page']))&&((int)$this->parameter['page']!==0)){
+  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->parameter['page']-1)."'>前へ</a>";
+  }else{
+  echo "前へ";
+  }
+ echo "■";
+  if(count($data['logs'])<$this->parameter['value']){
+  echo "次へ";
+  }else{
+   if(!isset($this->parameter['page'])){
+   $this->parameter['page'] = 0;
+   }
+  echo "<a href='chalog.php?".$query_url_without_page."&page=".($this->parameter['page']+1)."'>次へ</a>";
+  }
  echo "</p>";
  echo "<p style='line-height:1.2;letter-spacing:0.5px;'>";
  $n = 1;
  foreach($data['logs'] as $log){
-  try{
-  $date = new DateTime($log['time']);
-  }catch (Exception $e){
-  echo $e->getMessage();
-  die(1);
-  }
- $unixtime = $date->getTimestamp();
+ $record_date = new DateTime($log['time']);
+ $record_unixtime = $record_date->getTimestamp();
  $line_number = sprintf("%04d",$n);
- $color = explode(".",$log['ip']);
- $r = intval($color[0]/1.33);
- $g = intval($color[1]/1.33);
- $b = intval($color[2]/1.33);
- $date = date("Y-m-d H:i:s",$unixtime);
+ $r = 0; $g = 0; $b = 0;
+  if(!empty($log['ip'])){
+  $color = explode(".",$log['ip']);
+  $r = intval($color[0]/1.33);
+  $g = intval($color[1]/1.33);
+  $b = intval($color[2]/1.33);
+  }
   if(is_array($log['comment'])){
   $comment = htmlspecialchars($log['comment'][0],ENT_QUOTES,"UTF-8");
   }else{
@@ -275,17 +244,73 @@ echo "</table>";
     $comment .= "</code>";
    $code_tag_count--;
    }
- $before_term = $unixtime - 30*60;
- $after_term = $unixtime + 30*60;
- $detail_query = "chalog.php?starttime=".$before_term."&endtime=".$after_term."&value=500";
+
+ $range_start = date("Y-m-d\TH:i:s\Z",$record_unixtime - 30*60 - 60 * 60 * 9);
+ $range_end = date("Y-m-d\TH:i:s\Z",$record_unixtime + 30*60 - 60 * 60 * 9);
+ $detail_query = "chalog.php?starttime=".$range_start."&endtime=".$range_end."&value=500";
  echo "<a href='".$detail_query."' target='_blank'>".$line_number."</a>：";
  echo "<span style='color:rgb(".$r.",".$g.",".$b.");'><b>".$log['name']."</b>>&nbsp;";
  echo $comment;
- echo "</span>&nbsp;<span style='color:silver;font-size:small;'>(".$date.",".$log['ip'].")</span><br>\n";
+ echo "</span>&nbsp;<span style='color:silver;font-size:small;'>(".date("Y-m-d H:i:s",$record_unixtime).",".$log['ip'].")</span><br>\n";
  $n++;
  }
  echo "</p>";
+ }
+
 }
+
+//クエリ組立
+
+class query{
+ private $query_url = "";
+ private $query_url_without_page = "";
+ private $query_url_array = array();
+ private $parameter;
+ 
+ function __construct($parameter){
+ $this->parameter = $parameter;
+ }
+ 
+ function interprete_time(){
+  if(isset($this->parameter['starttime'])){
+  $this->query_url_array[] = "starttime=".$this->parameter['starttime'];
+  }
+  if(isset($this->parameter['endtime'])){
+  $this->query_url_array[] = "endtime=".$this->parameter['endtime'];
+  }
+ }
+ 
+ private function interprete_parameter($key){
+ $this->query_url_array[] = $key."=".rawurlencode($this->parameter[$key]);
+ }
+ 
+ private function build_query(){
+ $this->interprete_time();
+ $key_list = array('name','ip','comment','value');
+  foreach($key_list as $key){
+   if(isset($this->parameter[$key])){
+   $this->interprete_parameter($key);
+   }
+  }
+ 
+ $this->query_url_without_page = implode("&",$this->query_url_array);
+  if(isset($this->parameter['page'])){
+  $this->query_url = $this->query_url_without_page."&page=".$this->parameter['page'];
+  }else{
+  $this->query_url = $this->query_url_without_page;
+  }
+ }
+ 
+ function get_query(){
+ return $this->query_url_without_page;
+ }
+ 
+ function fetch_data(){
+ $this->build_query();
+ $raw_data = file_get_contents("http://chat.81.la/chalog?".$this->query_url);
+ $data = json_decode($raw_data,true);
+ return $data;
+ }
 
 }
 

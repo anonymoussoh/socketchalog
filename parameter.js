@@ -1,85 +1,83 @@
 function preload(){
-today = new Date();
-year = today.getFullYear();
-month = today.getMonth();
-month++;
-day = today.getDate();
-if(document.query.maxyear.value==""){
-document.query.maxyear.value = year;
-}
-if(document.query.maxmonth.value==""){
-document.query.maxmonth.value = month;
-}
-if(document.query.maxday.value==""){
-document.query.maxday.value = day;
-}
-if(document.query.minyear.value==""){
-document.query.minyear.value = year;
-}
-if(document.query.minmonth.value==""){
-document.query.minmonth.value = month;
-}
-if(document.query.minday.value==""){
-document.query.minday.value = day;
-}
+ var today = new Date();
+ var year = today.getFullYear();
+ var month = today.getMonth();
+ month++;
+ var day = today.getDate();
+  if(document.query.maxyear.value==""){
+  document.query.maxyear.value = year;
+  }
+  if(document.query.maxmonth.value==""){
+  document.query.maxmonth.value = month;
+  }
+  if(document.query.maxday.value==""){
+  document.query.maxday.value = day;
+  }
+  if(document.query.minyear.value==""){
+  document.query.minyear.value = year;
+  }
+  if(document.query.minmonth.value==""){
+  document.query.minmonth.value = month;
+  }
+  if(document.query.minday.value==""){
+  document.query.minday.value = day;
+  }
 }
 
 function send_query(){
-maxyear = document.query.maxyear.value;
-maxmonth = document.query.maxmonth.value;
-maxmonth--;
-maxday = document.query.maxday.value;
-maxhour = document.query.maxhour.value;
-maxminute = document.query.maxminute.value;
-maxDate = new Date(parseInt(maxyear),parseInt(maxmonth),parseInt(maxday),parseInt(maxhour),parseInt(maxminute));
-maxtime = maxDate.getTime();
+ var maxyear = document.query.maxyear.value || 2010;
+ var maxmonth = document.query.maxmonth.value || 1;
+ maxmonth--;
+ var maxday = document.query.maxday.value || 1;
+ var maxhour = document.query.maxhour.value || 1;
+ var maxminute = document.query.maxminute.value || 0;
+ var maxDate = new Date(parseInt(maxyear),parseInt(maxmonth),parseInt(maxday),parseInt(maxhour),parseInt(maxminute));
+ var maxtime = maxDate.toISOString();
 
-minyear = document.query.minyear.value;
-minmonth = document.query.minmonth.value;
-minmonth--;
-minday = document.query.minday.value;
-minhour = document.query.minhour.value;
-minminute = document.query.minminute.value;
-minDate = new Date(parseInt(minyear),parseInt(minmonth),parseInt(minday),parseInt(minhour),parseInt(minminute));
-mintime = minDate.getTime();
-
+ var minyear = document.query.minyear.value || 2010;
+ var minmonth = document.query.minmonth.value || 1;
+ minmonth--;
+ var minday = document.query.minday.value || 1;
+ var minhour = document.query.minhour.value || 0;
+ var minminute = document.query.minminute.value || 0;
+ var minDate = new Date(parseInt(minyear),parseInt(minmonth),parseInt(minday),parseInt(minhour),parseInt(minminute));
+ var mintime = minDate.toISOString();
+ 
  var url = "chalog.php?"
+ var query_array = [];
  if(document.query.searcharea.checked){
   if(mintime){
-  url += "starttime=" + mintime;
-  }
-  if((mintime)&&(maxtime)){
-  url += "&";
+  query_array.push("starttime=" + mintime);
   }
   if(maxtime){
-  url += "endtime=" + maxtime;
+  query_array.push("endtime=" + maxtime);
   }
- url += "&";
  }
+ 
  if(document.query.searchtype[0].checked){
   if(document.query.nameorip[0].checked){
-  url += "name="+encodeURIComponent(document.query.name_ip.value);
-  }
-  if((document.query.nameorip[0].checked==true)&&(document.query.nameorip[1].checked==true)){
-  url += "&";
+  query_array.push("name="+encodeURIComponent(document.query.name_ip.value));
   }
   if(document.query.nameorip[1].checked){
-  url += "ip="+escape(document.query.name_ip.value);
+  query_array.push("ip="+escape(document.query.name_ip.value));
   }
- url += "&";
  }
+ 
  if((document.query.searchtype[1].checked==true)&&(document.query.comment.value)){
- url += "comment="+encodeURIComponent(document.query.comment.value)+"&";
+ query_array.push("comment="+encodeURIComponent(document.query.comment.value));
  }
+ 
  if(document.query.latest.value){
   if(parseInt(document.query.latest.value)>5000){
-  url += "value=5000&page=0";
+  query_array.push("value=5000&page=0");
   }else{
-  url += "value="+document.query.latest.value+"&page=0";
+  query_array.push("value="+document.query.latest.value+"&page=0");
   }
  }else{
- url += "value=500&page=0";
+ query_array.push("value=500&page=0");
  }
- location.href = url;
+ 
+ var query_string = query_array.join('&');
+ location.href = url + query_string;
  return false;
 }
